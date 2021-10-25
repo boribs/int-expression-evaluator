@@ -173,6 +173,13 @@ static void test_double_operator_only_applies_to_negative_numbers() {
     TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, D));
 }
 
+static void test_double_operator_only_applies_to_negative_numbers_2() {
+    char str[] = "1 + -2";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(-1, d);
+}
+
 static void test_operator_precedence_1() {
     char str[] = "1 + 2 * 3";
 
@@ -185,6 +192,13 @@ static void test_operator_precedence_2() {
 
     TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
     TEST_ASSERT_EQUAL(-14, d);
+}
+
+static void test_operator_precedence_3() {
+    char str[] = "-4 * -3";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(12, d);
 }
 
 int main() {
@@ -211,8 +225,10 @@ int main() {
     RUN_TEST(test_evaluate_negative_numbers);
     RUN_TEST(test_evaluate_more_negative_numbers);
     RUN_TEST(test_double_operator_only_applies_to_negative_numbers);
+    RUN_TEST(test_double_operator_only_applies_to_negative_numbers_2);
     RUN_TEST(test_operator_precedence_1);
     RUN_TEST(test_operator_precedence_2);
+    RUN_TEST(test_operator_precedence_3);
 
     return UnityEnd();
 }

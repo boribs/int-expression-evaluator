@@ -135,7 +135,12 @@ enum CState evaluate(char *s, long *result) {
             if (op == OP_MINUS) {
                 negative = !negative;
                 if (negative && number_stack.len != 0) {
-                    PUSH(&operator_stack, (long)OP_PLUS);
+                    if (current_p <= last_p && number_stack.len > 1) {
+                        HANDLE_OPERATOR(&number_stack, &operator_stack);
+                    }
+                    if (operator_stack.len == 0) {
+                        PUSH(&operator_stack, (long)OP_PLUS);
+                    }
                 }
             } else {
                 if (operator_stack.len != 0) {
@@ -152,6 +157,7 @@ enum CState evaluate(char *s, long *result) {
     }
 
     HANDLE_TOKEN(token, &negative, &number_stack);
+    // SHOW(&number_stack, &operator_stack);
 
     while (operator_stack.len != 0) {
         HANDLE_OPERATOR(&number_stack, &operator_stack);
@@ -166,7 +172,7 @@ enum CState evaluate(char *s, long *result) {
 
 // int main() {
 //     long d;
-//     char str[] = "1 - - 2";
+//     char str[] = "1 + - 2";
 
 //     printf("final state: %d\n", evaluate(str, &d));
 //     printf("final value: %ld\n", d);
