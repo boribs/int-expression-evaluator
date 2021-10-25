@@ -7,6 +7,16 @@
 #include "cal.h"
 #include "fstack.h"
 
+// macros for error handling
+#define CHECK_STATE(expr)   enum CState state = expr; \
+                            if (state != STATE_OK) return state;
+
+#define PUSH(s, val)   if(!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
+
+#define HANDLE_TOKEN(token, negative, n)   CHECK_STATE(handle_token(token, negative, n))
+#define HANDLE_OPERATOR(n, o)              CHECK_STATE(handle_operator(n, o))
+
+
 static long to_digit(char c) {
     return (long)(c - '0');
 }
@@ -74,20 +84,6 @@ static enum Operator parse_operator(char c) {
         default:  return OP_INVALID;
     }
 }
-
-#define SHOW(n, o)   show(n, "N"); \
-                     show(o, "O"); \
-                     printf("\n");
-
-// macros for errors
-#define CHECK_STATE(expr)   enum CState state = expr; \
-                            if (state != STATE_OK) return state;
-
-#define PUSH(s, val)   if(!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
-
-#define HANDLE_TOKEN(token, negative, n)   CHECK_STATE(handle_token(token, negative, n))
-#define HANDLE_OPERATOR(n, o)              CHECK_STATE(handle_operator(n, o))
-
 
 static enum CState handle_token(char *token, bool *negative, FStack *n) {
     long d;
@@ -157,7 +153,6 @@ enum CState evaluate(char *s, long *result) {
     }
 
     HANDLE_TOKEN(token, &negative, &number_stack);
-    // SHOW(&number_stack, &operator_stack);
 
     while (operator_stack.len != 0) {
         HANDLE_OPERATOR(&number_stack, &operator_stack);
@@ -169,12 +164,3 @@ enum CState evaluate(char *s, long *result) {
 
     return STATE_OK;
 }
-
-// int main() {
-//     long d;
-//     char str[] = "1 + - 2";
-
-//     printf("final state: %d\n", evaluate(str, &d));
-//     printf("final value: %ld\n", d);
-//     return 0;
-// }

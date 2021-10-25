@@ -6,7 +6,6 @@
 
 
 // This calculator wont process single user input above 10,000.
-// TODO: Test this
 #define MAX_MIN_VAL 10000
 #define MAX_MIN_VAL_STR "10000"
 #define MAX_MIN_VAL_STR_LEN 6
