@@ -7,3 +7,6 @@ build:
 
 run:
 	@./out
+
+clear:
+	@rm out
