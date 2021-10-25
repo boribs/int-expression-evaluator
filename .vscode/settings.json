@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "stdbool.h": "c",
-        "__nullptr": "cpp",
-        "cstddef": "cpp",
-        "type_traits": "cpp",
-        "limits": "cpp"
-    }
-}
