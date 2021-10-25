@@ -1,2 +1,1 @@
-# Numic
-Not-a-Numi-clone... it's not.
+La calculadora consiste de dos stacks, uno de operadores y uno de valores
