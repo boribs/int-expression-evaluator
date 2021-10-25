@@ -4,24 +4,15 @@
 
 #include "cal.h"
 
-static int is_valid_yes(char c) {
-    return c == 'y' || c == 'Y' || c == 's' || c == 'S';
-}
-static int is_valid_no(char c) {
-    return c == 'n' || c == 'N';
-}
-
-static int is_valid_char(char c) {
-    return is_valid_yes(c) || is_valid_no(c);
-}
 
 int main() {
     int repeat;
     char again;
     char expression[100];
 
+    printf("Escribe 'q' para salir.\n\n");
+
     do {
-        repeat = 0;
         memset(expression, 0, 100);
         printf("Ingresa una expresión:\n> ");
         for (size_t i = 0; i < 100; ++i) {
@@ -33,13 +24,16 @@ int main() {
             }
         }
 
-        get_result(expression);
-        printf("¿Desea ingresar otra? (s/n): ");
-        do {
-            scanf("%c", &again);
-        } while(!is_valid_char(again));
+        if (strlen(expression) != 0) {
+            for (size_t i = 0; i < strlen(expression); ++i) {
+                if (expression[i] == 'q') return 0;
+            }
 
-        if (is_valid_yes(again)) repeat = 1;
+            get_result(expression);
+        }
+
         fflush(stdin);
-    } while(repeat == 1);
+    } while(true);
+
+    return 0;
 }
