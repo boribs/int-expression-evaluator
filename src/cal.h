@@ -23,7 +23,6 @@ enum CState { // Calculator State
     STATE_INVALID_CHAR_ERROR,               // 7
     STATE_TOKEN_PARSE_ERROR,                // 8
     STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR, // 9
-    STATE_VERY_FEW_ELEMENTS_IN_STACK_ERROR, // 10
 };
 
 enum Operator {  // each Operator is of type `int`
@@ -37,5 +36,6 @@ enum Operator {  // each Operator is of type `int`
 bool parse_str_to_int(char *str, long *dest);
 enum CState operate(FStack *numbers, FStack *operators, long *result);
 enum CState evaluate(char *s, long *val);
+void get_result(char *expression);
 
 #endif

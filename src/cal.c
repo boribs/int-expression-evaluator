@@ -166,3 +166,26 @@ enum CState evaluate(char *s, long *result) {
 
     return STATE_OK;
 }
+
+void get_result(char *expression) {
+    long result;
+    enum CState s = evaluate(expression, &result);
+
+    switch (s) {
+        case STATE_OK:
+            printf("%s = %ld\n", expression, result);
+            break;
+        case STATE_DIVISION_BY_ZERO:
+            printf("Error: Hay una división entre 0.\n");break;
+        case STATE_MISSING_VALUE:
+        case STATE_PRESENT_OPERATOR:
+            printf("Error: Tienes muchos operadores y pocos números.\n");break;
+        case STATE_MISSING_OPERATOR:
+        case STATE_PRESENT_VALUE:
+            printf("Error: Tienes muchos números y pocos operadores.\n");break;
+        case STATE_INVALID_CHAR_ERROR:
+            printf("¡Hay un caractér inválido!\n");break;
+        default:
+            printf("Hubo un error fatal. Informa al creador.\n");break;
+    }
+}
