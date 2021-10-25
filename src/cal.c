@@ -147,8 +147,10 @@ enum CState evaluate(char *s, long *result) {
                 PUSH(&operator_stack, (long)op);
             }
 
-        } else { // not an operator, not a digit
+        } else if (current == ' ') {
             HANDLE_TOKEN(token, &negative, &number_stack);
+        } else {
+            return STATE_INVALID_CHAR_ERROR;
         }
     }
 

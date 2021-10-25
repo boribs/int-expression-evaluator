@@ -201,6 +201,12 @@ static void test_operator_precedence_3() {
     TEST_ASSERT_EQUAL(12, d);
 }
 
+static void test_invalid_char_error() {
+    char str[] = "3 * a";
+
+    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, D));
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -229,6 +235,7 @@ int main() {
     RUN_TEST(test_operator_precedence_1);
     RUN_TEST(test_operator_precedence_2);
     RUN_TEST(test_operator_precedence_3);
+    RUN_TEST(test_invalid_char_error);
 
     return UnityEnd();
 }
