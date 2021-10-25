@@ -208,6 +208,20 @@ static void test_operator_precedence_4() {
     TEST_ASSERT_EQUAL(-6, d);
 }
 
+static void test_random_expression() {
+    char str[] = "1 + -2 * -1";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(3, d);
+}
+
+static void test_more_random_expressions() {
+    char str[] = "1 * -2 + 2 -1 - 2";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(-3, d);
+}
+
 static void test_invalid_char_error() {
     char str[] = "3 * a";
 
@@ -244,6 +258,8 @@ int main() {
     RUN_TEST(test_operator_precedence_3);
     RUN_TEST(test_operator_precedence_4);
     RUN_TEST(test_invalid_char_error);
+    RUN_TEST(test_random_expression);
+    RUN_TEST(test_more_random_expressions);
 
     return UnityEnd();
 }

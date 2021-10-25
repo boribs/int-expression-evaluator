@@ -85,35 +85,38 @@ static enum Operator parse_operator(char c) {
     }
 }
 
+static enum CState handle_operator(FStack *n, FStack *o) {
+    long d;
+    CHECK_STATE(operate(n, o, &d));
+    push(n, d);
+
+    return STATE_OK;
+}
+
 static enum CState handle_token(char *token, FStack *n, FStack *o) {
     long d, op;
 
     if (strlen(token) != 0) {
         if (!parse_str_to_int(token, &d)) return STATE_TOKEN_PARSE_ERROR;
 
-        if (o->len != 0) {
-            enum Operator last_op = o->elements[o->len - 1];
-            if (last_op == OP_MINUS) {
-                pop(o, &op);
-                d *= -1;
 
-                if (n->len > 0 && o->len == n->len - 1) {
-                    PUSH(o, (long)OP_PLUS);
+        if (o->len != 0 && o->elements[o->len - 1] == OP_MINUS) {
+            d *= -1;
+            o->len--;
+
+            if (n->len > o->len) {
+                if (get_precedence(o->elements[o->len - 1]) > get_precedence(OP_PLUS)) {
+                    HANDLE_OPERATOR(n, o);
                 }
+
+                PUSH(o, OP_PLUS);
             }
+
         }
 
         PUSH(n, d);
         memset(token, 0, MAX_TOKEN_LEN);
     }
-
-    return STATE_OK;
-}
-
-static enum CState handle_operator(FStack *n, FStack *o) {
-    long d;
-    CHECK_STATE(operate(n, o, &d));
-    push(n, d);
 
     return STATE_OK;
 }
@@ -137,16 +140,22 @@ enum CState evaluate(char *s, long *result) {
             enum Operator op = parse_operator(current);
             long current_p = get_precedence(op);
 
-            if (operator_stack.len != 0) {
-                enum Operator  last_op = operator_stack.elements[operator_stack.len - 1];
+            if (operator_stack.len == 0) {
+                PUSH(&operator_stack, op);
+            } else if (operator_stack.len == 1) {
+                long last_op = operator_stack.elements[operator_stack.len - 1];
                 long last_p = get_precedence(last_op);
 
-                if (number_stack.len > 1 && current_p <= last_p) {
+                if (last_p >= current_p && op != OP_MINUS) {
                     HANDLE_OPERATOR(&number_stack, &operator_stack);
                 }
+                PUSH(&operator_stack, op);
+            } else {
+                if (operator_stack.len < number_stack.len) {
+                    HANDLE_OPERATOR(&number_stack, &operator_stack);
+                }
+                PUSH(&operator_stack, op);
             }
-
-            PUSH(&operator_stack, op);
 
         } else if (current == ' ') {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
