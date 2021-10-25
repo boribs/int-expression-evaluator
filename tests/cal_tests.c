@@ -201,6 +201,13 @@ static void test_operator_precedence_3() {
     TEST_ASSERT_EQUAL(12, d);
 }
 
+static void test_operator_precedence_4() {
+    char str[] = "1 - 2 * 3 - 1";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(-6, d);
+}
+
 static void test_invalid_char_error() {
     char str[] = "3 * a";
 
@@ -235,6 +242,7 @@ int main() {
     RUN_TEST(test_operator_precedence_1);
     RUN_TEST(test_operator_precedence_2);
     RUN_TEST(test_operator_precedence_3);
+    RUN_TEST(test_operator_precedence_4);
     RUN_TEST(test_invalid_char_error);
 
     return UnityEnd();

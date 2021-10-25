@@ -11,10 +11,10 @@
 #define CHECK_STATE(expr)   enum CState state = expr; \
                             if (state != STATE_OK) return state;
 
-#define PUSH(s, val)   if(!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
+#define PUSH(s, val)   if (!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
 
-#define HANDLE_TOKEN(token, negative, n)   CHECK_STATE(handle_token(token, negative, n))
-#define HANDLE_OPERATOR(n, o)              CHECK_STATE(handle_operator(n, o))
+#define HANDLE_TOKEN(token, n, o)   CHECK_STATE(handle_token(token, n, o))
+#define HANDLE_OPERATOR(n, o)       CHECK_STATE(handle_operator(n, o))
 
 
 static long to_digit(char c) {
@@ -85,14 +85,24 @@ static enum Operator parse_operator(char c) {
     }
 }
 
-static enum CState handle_token(char *token, bool *negative, FStack *n) {
-    long d;
+static enum CState handle_token(char *token, FStack *n, FStack *o) {
+    long d, op;
+
     if (strlen(token) != 0) {
         if (!parse_str_to_int(token, &d)) return STATE_TOKEN_PARSE_ERROR;
-        if (*negative) {
-            d *= -1;
-            *negative = false;
+
+        if (o->len != 0) {
+            enum Operator last_op = o->elements[o->len - 1];
+            if (last_op == OP_MINUS) {
+                pop(o, &op);
+                d *= -1;
+
+                if (n->len > 0 && o->len == n->len - 1) {
+                    PUSH(o, (long)OP_PLUS);
+                }
+            }
         }
+
         PUSH(n, d);
         memset(token, 0, MAX_TOKEN_LEN);
     }
@@ -122,42 +132,39 @@ enum CState evaluate(char *s, long *result) {
             token[strlen(token)] = current;
 
         } else if (is_operator(current)) {
-            HANDLE_TOKEN(token, &negative, &number_stack);
+            HANDLE_TOKEN(token, &number_stack, &operator_stack);
 
             enum Operator op = parse_operator(current);
-            long last_p = get_precedence(operator_stack.elements[operator_stack.len - 1]);
             long current_p = get_precedence(op);
 
-            if (op == OP_MINUS) {
-                negative = !negative;
-                if (negative && number_stack.len != 0) {
-                    if (current_p <= last_p && number_stack.len > 1) {
-                        HANDLE_OPERATOR(&number_stack, &operator_stack);
-                    }
-                    if (operator_stack.len == 0) {
-                        PUSH(&operator_stack, (long)OP_PLUS);
-                    }
+            if (operator_stack.len != 0) {
+                enum Operator  last_op = operator_stack.elements[operator_stack.len - 1];
+                long last_p = get_precedence(last_op);
+
+                if (number_stack.len > 1 && current_p <= last_p) {
+                    HANDLE_OPERATOR(&number_stack, &operator_stack);
                 }
-            } else {
-                if (operator_stack.len != 0) {
-                    if (current_p <= last_p) {
-                        HANDLE_OPERATOR(&number_stack, &operator_stack);
-                    }
-                }
-                PUSH(&operator_stack, (long)op);
             }
 
+            PUSH(&operator_stack, op);
+
         } else if (current == ' ') {
-            HANDLE_TOKEN(token, &negative, &number_stack);
+            HANDLE_TOKEN(token, &number_stack, &operator_stack);
         } else {
             return STATE_INVALID_CHAR_ERROR;
         }
     }
 
-    HANDLE_TOKEN(token, &negative, &number_stack);
+    if (strlen(token) != 0) {
+        HANDLE_TOKEN(token, &number_stack, &operator_stack);
+    }
 
     while (operator_stack.len != 0) {
         HANDLE_OPERATOR(&number_stack, &operator_stack);
+    }
+
+    if (number_stack.len != 1) {
+        return STATE_PRESENT_VALUE;
     }
 
     *result = number_stack.elements[0];
