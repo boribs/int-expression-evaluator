@@ -201,7 +201,7 @@ void get_result(char *expression) {
         case STATE_PRESENT_VALUE:
             printf("Error: Tienes muchos números y pocos operadores.\n");break;
         case STATE_INVALID_CHAR_ERROR:
-            printf("\nCaracter inválido en la posición %ld.\n\n", result);
+            printf("\nCaracter inválido `%c` en la posición %ld.\n\n", expression[result], result);
             printf("%s\n", expression);
             for (long i = 0; i < result; ++i) printf(" ");
             printf("^\n");
