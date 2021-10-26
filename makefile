@@ -8,5 +8,7 @@ build:
 run:
 	@./out
 
+br: build run
+
 clear:
 	@rm out
