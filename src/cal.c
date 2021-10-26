@@ -160,6 +160,7 @@ enum CState evaluate(char *s, long *result) {
         } else if (current == ' ') {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
         } else {
+            *result = (long)i;
             return STATE_INVALID_CHAR_ERROR;
         }
     }
@@ -200,7 +201,11 @@ void get_result(char *expression) {
         case STATE_PRESENT_VALUE:
             printf("Error: Tienes muchos números y pocos operadores.\n");break;
         case STATE_INVALID_CHAR_ERROR:
-            printf("¡Hay un caracter inválido!\n");break;
+            printf("\nCaracter inválido en la posición %ld.\n\n", result);
+            printf("%s\n", expression);
+            for (long i = 0; i < result; ++i) printf(" ");
+            printf("^\n");
+            break;
         default:
             printf("Hubo un error fatal. Informa al creador.\n");break;
     }
