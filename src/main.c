@@ -10,10 +10,11 @@ int main() {
     char again;
     char expression[100];
 
-    printf("Ingresa una expresión:\n> ");
+    printf("Ingresa una expresión:\n ");
     printf("Escribe 'q' para salir.\n\n");
 
     do {
+        printf("> ");
         memset(expression, 0, 100);
         for (size_t i = 0; i < 100; ++i) {
             scanf("%c", &expression[strlen(expression)]);
