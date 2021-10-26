@@ -200,7 +200,7 @@ void get_result(char *expression) {
         case STATE_PRESENT_VALUE:
             printf("Error: Tienes muchos números y pocos operadores.\n");break;
         case STATE_INVALID_CHAR_ERROR:
-            printf("¡Hay un caractér inválido!\n");break;
+            printf("¡Hay un caracter inválido!\n");break;
         default:
             printf("Hubo un error fatal. Informa al creador.\n");break;
     }
