@@ -25,12 +25,15 @@ int main() {
             }
         }
 
-        if (strlen(expression) != 0) {
-            for (size_t i = 0; i < strlen(expression); ++i) {
+        size_t len = strlen(expression);
+        if (len != 0) {
+            for (size_t i = 0; i < len; ++i) {
                 if (expression[i] == 'q') return 0;
             }
 
+            printf("\n");
             get_result(expression);
+            printf("\n");
         }
 
         fflush(stdin);
