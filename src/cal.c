@@ -109,26 +109,32 @@ static enum CState handle_operator(FStack *n, FStack *o) {
     return STATE_OK;
 }
 
+static enum CState handle_negative(FStack *n, FStack *o, long *d) {
+    // This should be called before pushing to the number stack
+
+    if (o->len != 0 && o->elements[o->len - 1] == OP_MINUS) {
+        *d *= -1;
+        o->len--;
+
+        if (n->len > o->len) {
+            if (get_precedence(o->elements[o->len - 1]) > get_precedence(OP_PLUS)) {
+                HANDLE_OPERATOR(n, o);
+            }
+
+            PUSH(o, OP_PLUS);
+        }
+    }
+
+    return STATE_OK;
+}
+
 static enum CState handle_token(char *token, FStack *n, FStack *o) {
     long d, op;
 
     if (strlen(token) != 0) {
         if (!parse_str_to_int(token, &d)) return STATE_TOKEN_PARSE_ERROR;
 
-
-        if (o->len != 0 && o->elements[o->len - 1] == OP_MINUS) {
-            d *= -1;
-            o->len--;
-
-            if (n->len > o->len) {
-                if (get_precedence(o->elements[o->len - 1]) > get_precedence(OP_PLUS)) {
-                    HANDLE_OPERATOR(n, o);
-                }
-
-                PUSH(o, OP_PLUS);
-            }
-
-        }
+        CHECK_STATE(handle_negative(n, o, &d));
 
         PUSH(n, d);
         memset(token, 0, MAX_TOKEN_LEN);
