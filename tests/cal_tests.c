@@ -228,6 +228,36 @@ static void test_invalid_char_error() {
     TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, D));
 }
 
+static void test_matching_parenthesis_simple() {
+    char str[] = "()";
+
+    TEST_ASSERT_EQUAL(1, find_matching_parenthesis(S));
+}
+
+static void test_matching_parenthesis_nested_parenthesis() {
+    char str[] = "(1 + 2 + ())";
+
+    TEST_ASSERT_EQUAL(11, find_matching_parenthesis(S));
+}
+
+static void test_matching_parenthesis_nested_parenthesis_2() {
+    char str[] = "(1 + 2 + ())";
+
+    TEST_ASSERT_EQUAL(1, find_matching_parenthesis(&str[9]));
+}
+
+static void test_cant_match_parenthesis_1() {
+    char str[] = "(";
+
+    TEST_ASSERT_EQUAL(-1, find_matching_parenthesis(S));
+}
+
+static void test_cant_match_parenthesis_2() {
+    char str[] = "( a + b ()";
+
+    TEST_ASSERT_EQUAL(-1, find_matching_parenthesis(S));
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -260,6 +290,11 @@ int main() {
     RUN_TEST(test_invalid_char_error);
     RUN_TEST(test_random_expression);
     RUN_TEST(test_more_random_expressions);
+    RUN_TEST(test_matching_parenthesis_simple);
+    RUN_TEST(test_matching_parenthesis_nested_parenthesis);
+    RUN_TEST(test_matching_parenthesis_nested_parenthesis_2);
+    RUN_TEST(test_cant_match_parenthesis_1);
+    RUN_TEST(test_cant_match_parenthesis_2);
 
     return UnityEnd();
 }

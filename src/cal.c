@@ -39,6 +39,22 @@ bool parse_str_to_int(char *str, long *dest) {
     return true;
 }
 
+int find_matching_parenthesis(char *str) {
+    // str should point to first (opening) parenthesis
+
+    if (str == NULL || str[0] != '(') return -1;
+    int count = 1;
+
+    for (size_t i = 1; i < strlen(str); ++i) {
+        if (str[i] == '(') count++;
+        if (str[i] == ')') count--;
+
+        if (count == 0) return i;
+    }
+
+    return (count == 0) ? 1 : -1;
+}
+
 enum CState operate(FStack *numbers, FStack *operators, long *result) {
     long first, second, op;
 
