@@ -8,8 +8,8 @@
 #include "fstack.h"
 
 // macros for error handling
-#define CHECK_STATE(expr)   enum CState state = expr; \
-                            if (state != STATE_OK) return state;
+#define CHECK_STATE(expr)   {enum CState state = expr; \
+                            if (state != STATE_OK) return state;}
 
 #define PUSH(s, val)   if (!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
 #define PUSH_N(n, o, val_ptr)    CHECK_STATE(handle_negative(n, o, val_ptr)); \
