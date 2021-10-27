@@ -12,6 +12,8 @@
                             if (state != STATE_OK) return state;
 
 #define PUSH(s, val)   if (!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
+#define PUSH_N(n, o, val_ptr)    CHECK_STATE(handle_negative(n, o, val_ptr)); \
+                                 PUSH(n, *val_ptr);
 
 #define HANDLE_TOKEN(token, n, o)   CHECK_STATE(handle_token(token, n, o))
 #define HANDLE_OPERATOR(n, o)       CHECK_STATE(handle_operator(n, o))
@@ -134,9 +136,7 @@ static enum CState handle_token(char *token, FStack *n, FStack *o) {
     if (strlen(token) != 0) {
         if (!parse_str_to_int(token, &d)) return STATE_TOKEN_PARSE_ERROR;
 
-        CHECK_STATE(handle_negative(n, o, &d));
-
-        PUSH(n, d);
+        PUSH_N(n, o, &d);
         memset(token, 0, MAX_TOKEN_LEN);
     }
 
