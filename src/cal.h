@@ -37,7 +37,7 @@ enum Operator {  // each Operator is of type `int`
 bool parse_str_to_int(char *str, long *dest);
 int find_matching_parenthesis(char *str);
 enum CState operate(FStack *numbers, FStack *operators, long *result);
-enum CState evaluate(char *s, long *val);
+enum CState evaluate(char *s, size_t len, long *val);
 void get_result(char *expression);
 
 #endif

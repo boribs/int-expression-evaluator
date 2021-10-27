@@ -143,14 +143,14 @@ static enum CState handle_token(char *token, FStack *n, FStack *o) {
     return STATE_OK;
 }
 
-enum CState evaluate(char *s, long *result) {
+enum CState evaluate(char *s, size_t len, long *result) {
     FStack operator_stack = new_fstack(3);
     FStack number_stack = new_fstack(3);
 
     char token[MAX_TOKEN_LEN] = {0};
     bool negative = false;
 
-    for (size_t i = 0; i < strlen(s); ++i) {
+    for (size_t i = 0; i < len; ++i) {
         char current = s[i];
 
         if (isdigit(current)) {
@@ -181,6 +181,16 @@ enum CState evaluate(char *s, long *result) {
 
         } else if (current == ' ') {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
+
+        } else if (current == '(') {
+            int m_index = find_matching_parenthesis(&s[i]);
+            long d;
+
+            CHECK_STATE(evaluate(&s[i + 1], m_index - 1, &d));
+            PUSH_N(&number_stack, &operator_stack, &d);
+
+            i += m_index;
+
         } else {
             *result = (long)i;
             return STATE_INVALID_CHAR_ERROR;
@@ -208,7 +218,7 @@ enum CState evaluate(char *s, long *result) {
 
 void get_result(char *expression) {
     long result;
-    enum CState s = evaluate(expression, &result);
+    enum CState s = evaluate(expression, strlen(expression), &result);
 
     switch (s) {
         case STATE_OK:
