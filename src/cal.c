@@ -8,10 +8,12 @@
 #include "fstack.h"
 
 // macros for error handling
-#define CHECK_STATE(expr)   enum CState state = expr; \
-                            if (state != STATE_OK) return state;
+#define CHECK_STATE(expr)   {enum CState state = expr; \
+                            if (state != STATE_OK) return state;}
 
 #define PUSH(s, val)   if (!push(s, val)) return STATE_TOO_MANY_ELEMENTS_IN_STACK_ERROR;
+#define PUSH_N(n, o, val_ptr)    CHECK_STATE(handle_negative(n, o, val_ptr)); \
+                                 PUSH(n, *val_ptr);
 
 #define HANDLE_TOKEN(token, n, o)   CHECK_STATE(handle_token(token, n, o))
 #define HANDLE_OPERATOR(n, o)       CHECK_STATE(handle_operator(n, o))
@@ -37,6 +39,22 @@ bool parse_str_to_int(char *str, long *dest) {
     }
 
     return true;
+}
+
+int find_matching_parenthesis(char *str) {
+    // str should point to first (opening) parenthesis
+
+    if (str == NULL || str[0] != '(') return -1;
+    int count = 1;
+
+    for (size_t i = 1; i < strlen(str); ++i) {
+        if (str[i] == '(') count++;
+        if (str[i] == ')') count--;
+
+        if (count == 0) return i;
+    }
+
+    return (count == 0) ? 1 : -1;
 }
 
 enum CState operate(FStack *numbers, FStack *operators, long *result) {
@@ -93,42 +111,45 @@ static enum CState handle_operator(FStack *n, FStack *o) {
     return STATE_OK;
 }
 
+static enum CState handle_negative(FStack *n, FStack *o, long *d) {
+    // This should be called before pushing to the number stack
+
+    if (o->len != 0 && o->elements[o->len - 1] == OP_MINUS) {
+        *d *= -1;
+        o->len--;
+
+        if (n->len > o->len) {
+            if (get_precedence(o->elements[o->len - 1]) > get_precedence(OP_PLUS)) {
+                HANDLE_OPERATOR(n, o);
+            }
+
+            PUSH(o, OP_PLUS);
+        }
+    }
+
+    return STATE_OK;
+}
+
 static enum CState handle_token(char *token, FStack *n, FStack *o) {
     long d, op;
 
     if (strlen(token) != 0) {
         if (!parse_str_to_int(token, &d)) return STATE_TOKEN_PARSE_ERROR;
 
-
-        if (o->len != 0 && o->elements[o->len - 1] == OP_MINUS) {
-            d *= -1;
-            o->len--;
-
-            if (n->len > o->len) {
-                if (get_precedence(o->elements[o->len - 1]) > get_precedence(OP_PLUS)) {
-                    HANDLE_OPERATOR(n, o);
-                }
-
-                PUSH(o, OP_PLUS);
-            }
-
-        }
-
-        PUSH(n, d);
+        PUSH_N(n, o, &d);
         memset(token, 0, MAX_TOKEN_LEN);
     }
 
     return STATE_OK;
 }
 
-enum CState evaluate(char *s, long *result) {
+enum CState evaluate(char *s, size_t len, long *result) {
     FStack operator_stack = new_fstack(3);
     FStack number_stack = new_fstack(3);
 
     char token[MAX_TOKEN_LEN] = {0};
-    bool negative = false;
 
-    for (size_t i = 0; i < strlen(s); ++i) {
+    for (size_t i = 0; i < len; ++i) {
         char current = s[i];
 
         if (isdigit(current)) {
@@ -159,15 +180,34 @@ enum CState evaluate(char *s, long *result) {
 
         } else if (current == ' ') {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
+
+        } else if (current == '(') {
+            HANDLE_TOKEN(token, &number_stack, &operator_stack);
+
+            int m_index = find_matching_parenthesis(&s[i]);
+            long d;
+
+            CHECK_STATE(evaluate(&s[i + 1], m_index - 1, &d));
+
+            if (number_stack.len != 0 && operator_stack.len == 0) {
+                PUSH(&operator_stack, (long)OP_PRODUCT);
+            }
+
+            PUSH_N(&number_stack, &operator_stack, &d);
+
+            if (operator_stack.len < number_stack.len && number_stack.len > 1) {
+                HANDLE_OPERATOR(&number_stack, &operator_stack);
+            }
+
+            i += m_index;
+
         } else {
             *result = (long)i;
             return STATE_INVALID_CHAR_ERROR;
         }
     }
 
-    if (strlen(token) != 0) {
-        HANDLE_TOKEN(token, &number_stack, &operator_stack);
-    }
+    HANDLE_TOKEN(token, &number_stack, &operator_stack);
 
     while (operator_stack.len != 0) {
         HANDLE_OPERATOR(&number_stack, &operator_stack);
@@ -186,7 +226,7 @@ enum CState evaluate(char *s, long *result) {
 
 void get_result(char *expression) {
     long result;
-    enum CState s = evaluate(expression, &result);
+    enum CState s = evaluate(expression, strlen(expression), &result);
 
     switch (s) {
         case STATE_OK:

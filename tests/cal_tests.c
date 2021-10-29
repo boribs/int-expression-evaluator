@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "unity/unity.h"
 #include "../src/fstack.h"
@@ -9,6 +10,7 @@ FStack n, o;
 
 #define D &d
 #define S &str[0]
+#define L strlen(str)
 #define N &n
 #define O &o
 
@@ -100,132 +102,258 @@ static void test_operate_division_by_zero() {
 static void test_evaluate_simple_sum() {
     char str[] = "1 + 1";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(2, d);
 }
 
 static void test_evaluate_simple_rest() {
     char str[] = "1 - 1";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(0, d);
 }
 
 static void test_evaluate_simple_product() {
     char str[] = "1 * 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(2, d);
 }
 
 static void test_evaluate_simple_division() {
     char str[] = "1 / 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(0, d);
 }
 
 static void test_evaluate_many_sums() {
     char str[] = "1 + 2 + 3";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(6, d);
 }
 
 static void test_evaluate_many_rests() {
     char str[] = "1 - 2 - 3";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-4, d);
 }
 
 static void test_evaluate_many_products() {
     char str[] = "1 * 2 * 6";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(12, d);
 }
 
 static void test_evaluate_many_divisions() {
     char str[] = "80 / 2 / 4";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(10, d);
 }
 
 static void test_evaluate_negative_numbers() {
     char str[] = "1 - - 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(3, d);
 }
 
 static void test_evaluate_more_negative_numbers() {
     char str[] = "-1 * 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-2, d);
 }
 
 static void test_double_operator_only_applies_to_negative_numbers() {
     char str[] = "1 - + 2";
 
-    TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, L, D));
 }
 
 static void test_double_operator_only_applies_to_negative_numbers_2() {
     char str[] = "1 + -2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-1, d);
 }
 
 static void test_operator_precedence_1() {
     char str[] = "1 + 2 * 3";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(7, d);
 }
 
 static void test_operator_precedence_2() {
     char str[] = "-4 * 3 - 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-14, d);
 }
 
 static void test_operator_precedence_3() {
     char str[] = "-4 * -3";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(12, d);
 }
 
 static void test_operator_precedence_4() {
     char str[] = "1 - 2 * 3 - 1";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-6, d);
 }
 
 static void test_random_expression() {
     char str[] = "1 + -2 * -1";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(3, d);
 }
 
 static void test_more_random_expressions() {
     char str[] = "1 * -2 + 2 -1 - 2";
 
-    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
     TEST_ASSERT_EQUAL(-3, d);
 }
 
 static void test_invalid_char_error() {
     char str[] = "3 * a";
 
-    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, D));
+    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, L, D));
+}
+
+static void test_matching_parenthesis_simple() {
+    char str[] = "()";
+
+    TEST_ASSERT_EQUAL(1, find_matching_parenthesis(S));
+}
+
+static void test_matching_parenthesis_nested_parenthesis() {
+    char str[] = "(1 + 2 + ())";
+
+    TEST_ASSERT_EQUAL(11, find_matching_parenthesis(S));
+}
+
+static void test_matching_parenthesis_nested_parenthesis_2() {
+    char str[] = "(1 + 2 + ())";
+
+    TEST_ASSERT_EQUAL(1, find_matching_parenthesis(&str[9]));
+}
+
+static void test_cant_match_parenthesis_1() {
+    char str[] = "(";
+
+    TEST_ASSERT_EQUAL(-1, find_matching_parenthesis(S));
+}
+
+static void test_cant_match_parenthesis_2() {
+    char str[] = "( a + b ()";
+
+    TEST_ASSERT_EQUAL(-1, find_matching_parenthesis(S));
+}
+
+static void test_evaluate_expression_in_parenthesis() {
+    char str[] = "(1 + 1)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_evaluate_expression_with_parenthesis() {
+    char str[] = "1 + (1 * 3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(4, d);
+}
+
+static void test_evaluate_expression_with_negative_parenthesis() {
+    char str[] = "- (1 + 1)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-2, d);
+}
+
+static void test_evaluate_expression_with_negative_parenthesis_2() {
+    char str[] = "3 * -(1 + 1)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-6, d);
+}
+
+static void test_evaluate_parenthesis_errors_when_evaluation_errors() {
+    char str[] = "3 * (1 -)";
+
+    TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, L, D));
+}
+
+static void test_evaluate_nested_parenthesis_logic() {
+    char str[] = "1 + (1 + (1))";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(3, d);
+}
+
+static void test_evaluate_nested_parenthesis_logic_2() {
+    char str[] = "1 - (2 + 3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-4, d);
+}
+
+static void test_evaluate_nested_parenthesis_logic_3() {
+    char str[] = "1 - (2 + 3) + (3 * (3 - 2))";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-1, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator() {
+    char str[] = "1(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_2() {
+    char str[] = "(1)(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_3() {
+    char str[] = "-(1)(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_4() {
+    char str[] = "(1)2";
+
+    TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, L, D));
+}
+
+static void test_evaluate_parenthesis_as_product_operator_5() {
+    char str[] = "(1)(1 - 3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-2, d);
+}
+
+static void test_evaluate_expression_with_everything() {
+    char str[] = "1 + (2) -3 * (3 * 3) / 9 + (1 + (1 + (1)(1)))";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(3, d);
 }
 
 int main() {
@@ -260,6 +388,25 @@ int main() {
     RUN_TEST(test_invalid_char_error);
     RUN_TEST(test_random_expression);
     RUN_TEST(test_more_random_expressions);
+    RUN_TEST(test_matching_parenthesis_simple);
+    RUN_TEST(test_matching_parenthesis_nested_parenthesis);
+    RUN_TEST(test_matching_parenthesis_nested_parenthesis_2);
+    RUN_TEST(test_cant_match_parenthesis_1);
+    RUN_TEST(test_cant_match_parenthesis_2);
+    RUN_TEST(test_evaluate_expression_in_parenthesis);
+    RUN_TEST(test_evaluate_expression_with_parenthesis);
+    RUN_TEST(test_evaluate_expression_with_negative_parenthesis);
+    RUN_TEST(test_evaluate_expression_with_negative_parenthesis_2);
+    RUN_TEST(test_evaluate_parenthesis_errors_when_evaluation_errors);
+    RUN_TEST(test_evaluate_nested_parenthesis_logic);
+    RUN_TEST(test_evaluate_nested_parenthesis_logic_2);
+    RUN_TEST(test_evaluate_nested_parenthesis_logic_3);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_2);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_3);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_4);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_5);
+    RUN_TEST(test_evaluate_expression_with_everything);
 
     return UnityEnd();
 }
