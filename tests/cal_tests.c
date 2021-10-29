@@ -359,13 +359,15 @@ static void test_evaluate_expression_with_everything() {
 static void test_mismatched_parenthesis_error() {
     char str[] = "1 + (";
 
-    TEST_ASSERT_EQUAL(STATE_MISMATCHED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(STATE_UNCLOSED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(4, d);
 }
 
 static void test_mismatched_parenthesis_within_parenthesis_error() {
     char str[] = "1 + (1 - 2))";
 
-    TEST_ASSERT_EQUAL(STATE_MISMATCHED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(STATE_UNOPENED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(11, d);
 }
 
 int main() {

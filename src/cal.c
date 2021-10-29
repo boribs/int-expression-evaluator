@@ -187,7 +187,7 @@ enum CState evaluate(char *s, size_t len, long *result) {
             int m_index = find_matching_parenthesis(&s[i]);
             if (m_index == -1) {
                 *result = (long)i;
-                return STATE_MISMATCHED_PARENTHESIS;
+                return STATE_UNCLOSED_PARENTHESIS;
             }
             long d;
 
@@ -208,7 +208,7 @@ enum CState evaluate(char *s, size_t len, long *result) {
         } else {
             *result = (long)i;
 
-            if (current == ')') return STATE_MISMATCHED_PARENTHESIS;
+            if (current == ')') return STATE_UNOPENED_PARENTHESIS;
             else return STATE_INVALID_CHAR_ERROR;
         }
     }
