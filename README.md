@@ -5,6 +5,9 @@ Para usarlo hay que ingresar una expresión como alguna de estas:
     4 * 3 - 1 + 2
     3 - 5 * -1
     5 * 100 - 3
+    4 + (-2)
+    -7 - (36 / -3)
+    (3)(1 - 2) + 5
 
 ```
  Solo leerá 100 caracteres.
