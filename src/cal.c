@@ -148,7 +148,6 @@ enum CState evaluate(char *s, size_t len, long *result) {
     FStack number_stack = new_fstack(3);
 
     char token[MAX_TOKEN_LEN] = {0};
-    bool negative = false;
 
     for (size_t i = 0; i < len; ++i) {
         char current = s[i];
