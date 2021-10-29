@@ -356,6 +356,20 @@ static void test_evaluate_expression_with_everything() {
     TEST_ASSERT_EQUAL(3, d);
 }
 
+static void test_mismatched_parenthesis_error() {
+    char str[] = "1 + (";
+
+    TEST_ASSERT_EQUAL(STATE_UNCLOSED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(4, d);
+}
+
+static void test_mismatched_parenthesis_within_parenthesis_error() {
+    char str[] = "1 + (1 - 2))";
+
+    TEST_ASSERT_EQUAL(STATE_UNOPENED_PARENTHESIS, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(11, d);
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -407,6 +421,8 @@ int main() {
     RUN_TEST(test_evaluate_parenthesis_as_product_operator_4);
     RUN_TEST(test_evaluate_parenthesis_as_product_operator_5);
     RUN_TEST(test_evaluate_expression_with_everything);
+    RUN_TEST(test_mismatched_parenthesis_error);
+    RUN_TEST(test_mismatched_parenthesis_within_parenthesis_error);
 
     return UnityEnd();
 }

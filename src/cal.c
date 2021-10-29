@@ -185,6 +185,10 @@ enum CState evaluate(char *s, size_t len, long *result) {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
 
             int m_index = find_matching_parenthesis(&s[i]);
+            if (m_index == -1) {
+                *result = (long)i;
+                return STATE_UNCLOSED_PARENTHESIS;
+            }
             long d;
 
             CHECK_STATE(evaluate(&s[i + 1], m_index - 1, &d));
@@ -203,7 +207,9 @@ enum CState evaluate(char *s, size_t len, long *result) {
 
         } else {
             *result = (long)i;
-            return STATE_INVALID_CHAR_ERROR;
+
+            if (current == ')') return STATE_UNOPENED_PARENTHESIS;
+            else return STATE_INVALID_CHAR_ERROR;
         }
     }
 
@@ -242,6 +248,18 @@ void get_result(char *expression) {
             printf("Error: Tienes muchos números y pocos operadores.\n");break;
         case STATE_INVALID_CHAR_ERROR:
             printf("\nCaracter inválido `%c` en la posición %ld.\n\n", expression[result], result);
+            printf("%s\n", expression);
+            for (long i = 0; i < result; ++i) printf(" ");
+            printf("^\n");
+            break;
+        case STATE_UNCLOSED_PARENTHESIS:
+            printf("\nParéntesis sin cerrar en la posición: %ld\n\n", result);
+            printf("%s\n", expression);
+            for (long i = 0; i < result; ++i) printf(" ");
+            printf("^\n");
+            break;
+        case STATE_UNOPENED_PARENTHESIS:
+            printf("\nParéntesis sin abrir en la posición: %ld\n\n", result);
             printf("%s\n", expression);
             for (long i = 0; i < result; ++i) printf(" ");
             printf("^\n");
