@@ -315,6 +315,40 @@ static void test_evaluate_nested_parenthesis_logic_3() {
     TEST_ASSERT_EQUAL(-1, d);
 }
 
+static void test_evaluate_parenthesis_as_product_operator() {
+    char str[] = "1(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_2() {
+    char str[] = "(1)(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_3() {
+    char str[] = "-(1)(2)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-2, d);
+}
+
+static void test_evaluate_parenthesis_as_product_operator_4() {
+    char str[] = "(1)2";
+
+    TEST_ASSERT_NOT_EQUAL(STATE_OK, evaluate(S, L, D));
+}
+
+static void test_evaluate_parenthesis_as_product_operator_5() {
+    char str[] = "(1)(1 - 3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(-2, d);
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -360,6 +394,11 @@ int main() {
     RUN_TEST(test_evaluate_nested_parenthesis_logic);
     RUN_TEST(test_evaluate_nested_parenthesis_logic_2);
     RUN_TEST(test_evaluate_nested_parenthesis_logic_3);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_2);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_3);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_4);
+    RUN_TEST(test_evaluate_parenthesis_as_product_operator_5);
 
     return UnityEnd();
 }
