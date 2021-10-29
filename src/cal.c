@@ -191,7 +191,14 @@ enum CState evaluate(char *s, size_t len, long *result) {
             }
             long d;
 
-            CHECK_STATE(evaluate(&s[i + 1], m_index - 1, &d));
+            enum CState state = evaluate(&s[i + 1], m_index - 1, &d);
+            if (state != STATE_OK) {
+                if (state == STATE_INVALID_CHAR_ERROR) {
+                    *result = d + 1 + i;
+                }
+
+                return state;
+            }
 
             if (number_stack.len != 0 && operator_stack.len == 0) {
                 PUSH(&operator_stack, (long)OP_PRODUCT);
