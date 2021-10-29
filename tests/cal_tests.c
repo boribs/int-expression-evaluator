@@ -391,6 +391,48 @@ static void test_invalid_character_inside_nested_parenthesis_2() {
     TEST_ASSERT_EQUAL(14, d);
 }
 
+static void test_parenthesis_product() {
+    char str[] = "1 + 2(3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(7, d);
+}
+
+static void test_parenthesis_product_2() {
+    char str[] = "1 + (2)(3)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(7, d);
+}
+
+static void test_parenthesis_product_3() {
+    char str[] = "1 - 2(-5)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(11, d);
+}
+
+static void test_parenthesis_product_4() {
+    char str[] = "1 - (1)(1)(1)(1)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(0, d);
+}
+
+static void test_parenthesis_product_5() {
+    char str[] = "1 - -(1)(1)(1)(1)";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
+static void test_parenthesis_product_6() {
+    char str[] = "1 - (-(1)(1)(1)(1))";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(2, d);
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -447,6 +489,12 @@ int main() {
     RUN_TEST(test_invalid_character_inside_parenthesis);
     RUN_TEST(test_invalid_character_inside_nested_parenthesis);
     RUN_TEST(test_invalid_character_inside_nested_parenthesis_2);
+    RUN_TEST(test_parenthesis_product);
+    RUN_TEST(test_parenthesis_product_2);
+    RUN_TEST(test_parenthesis_product_3);
+    RUN_TEST(test_parenthesis_product_4);
+    RUN_TEST(test_parenthesis_product_5);
+    RUN_TEST(test_parenthesis_product_6);
 
     return UnityEnd();
 }

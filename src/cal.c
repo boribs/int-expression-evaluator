@@ -200,13 +200,15 @@ enum CState evaluate(char *s, size_t len, long *result) {
                 return state;
             }
 
-            if (number_stack.len != 0 && operator_stack.len == 0) {
+            bool added_product = false;
+            if (number_stack.len != 0 && operator_stack.len < number_stack.len) {
                 PUSH(&operator_stack, (long)OP_PRODUCT);
+                added_product = true;
             }
 
             PUSH_N(&number_stack, &operator_stack, &d);
 
-            if (operator_stack.len < number_stack.len && number_stack.len > 1) {
+            if (operator_stack.len < number_stack.len && number_stack.len > 1 && added_product) {
                 HANDLE_OPERATOR(&number_stack, &operator_stack);
             }
 
