@@ -253,13 +253,13 @@ void get_result(char *expression) {
             printf("^\n");
             break;
         case STATE_UNCLOSED_PARENTHESIS:
-            printf("\nParéntesis sin cerrar en la posición: %ld\n", result);
+            printf("\nParéntesis sin cerrar en la posición: %ld\n\n", result);
             printf("%s\n", expression);
             for (long i = 0; i < result; ++i) printf(" ");
             printf("^\n");
             break;
         case STATE_UNOPENED_PARENTHESIS:
-            printf("\nParéntesis sin abrir en la posición: %ld\n", result);
+            printf("\nParéntesis sin abrir en la posición: %ld\n\n", result);
             printf("%s\n", expression);
             for (long i = 0; i < result; ++i) printf(" ");
             printf("^\n");
