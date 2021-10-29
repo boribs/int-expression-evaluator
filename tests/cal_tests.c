@@ -15,7 +15,7 @@ FStack n, o;
 #define O &o
 
 void setUp() {
-    d = -1;
+    d = -2;
     n = new_fstack(3);
     o = new_fstack(3);
 }
@@ -370,6 +370,27 @@ static void test_mismatched_parenthesis_within_parenthesis_error() {
     TEST_ASSERT_EQUAL(11, d);
 }
 
+static void test_invalid_character_inside_parenthesis() {
+    char str[] = "(a)";
+
+    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(1, d);
+}
+
+static void test_invalid_character_inside_nested_parenthesis() {
+    char str[] = "1 + ((a))";
+
+    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(6, d);
+}
+
+static void test_invalid_character_inside_nested_parenthesis_2() {
+    char str[] = "1 + (2 - (1 - a))";
+
+    TEST_ASSERT_EQUAL(STATE_INVALID_CHAR_ERROR, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(14, d);
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -423,6 +444,9 @@ int main() {
     RUN_TEST(test_evaluate_expression_with_everything);
     RUN_TEST(test_mismatched_parenthesis_error);
     RUN_TEST(test_mismatched_parenthesis_within_parenthesis_error);
+    RUN_TEST(test_invalid_character_inside_parenthesis);
+    RUN_TEST(test_invalid_character_inside_nested_parenthesis);
+    RUN_TEST(test_invalid_character_inside_nested_parenthesis_2);
 
     return UnityEnd();
 }
