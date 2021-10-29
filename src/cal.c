@@ -197,9 +197,7 @@ enum CState evaluate(char *s, size_t len, long *result) {
         }
     }
 
-    if (strlen(token) != 0) {
-        HANDLE_TOKEN(token, &number_stack, &operator_stack);
-    }
+    HANDLE_TOKEN(token, &number_stack, &operator_stack);
 
     while (operator_stack.len != 0) {
         HANDLE_OPERATOR(&number_stack, &operator_stack);
