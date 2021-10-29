@@ -10,7 +10,7 @@ int main() {
     char again;
     char expression[100];
 
-    printf("Ingresa una expresión:\n ");
+    printf("Ingresa una expresión:\n");
     printf("Escribe 'q' para salir.\n\n");
 
     do {
