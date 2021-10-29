@@ -349,6 +349,13 @@ static void test_evaluate_parenthesis_as_product_operator_5() {
     TEST_ASSERT_EQUAL(-2, d);
 }
 
+static void test_evaluate_expression_with_everything() {
+    char str[] = "1 + (2) -3 * (3 * 3) / 9 + (1 + (1 + (1)(1)))";
+
+    TEST_ASSERT_EQUAL(STATE_OK, evaluate(S, L, D));
+    TEST_ASSERT_EQUAL(3, d);
+}
+
 int main() {
     UnityBegin("tests/fstack_tests.c");
 
@@ -399,6 +406,7 @@ int main() {
     RUN_TEST(test_evaluate_parenthesis_as_product_operator_3);
     RUN_TEST(test_evaluate_parenthesis_as_product_operator_4);
     RUN_TEST(test_evaluate_parenthesis_as_product_operator_5);
+    RUN_TEST(test_evaluate_expression_with_everything);
 
     return UnityEnd();
 }

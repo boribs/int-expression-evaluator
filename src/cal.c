@@ -182,11 +182,22 @@ enum CState evaluate(char *s, size_t len, long *result) {
             HANDLE_TOKEN(token, &number_stack, &operator_stack);
 
         } else if (current == '(') {
+            HANDLE_TOKEN(token, &number_stack, &operator_stack);
+
             int m_index = find_matching_parenthesis(&s[i]);
             long d;
 
             CHECK_STATE(evaluate(&s[i + 1], m_index - 1, &d));
+
+            if (number_stack.len != 0 && operator_stack.len == 0) {
+                PUSH(&operator_stack, (long)OP_PRODUCT);
+            }
+
             PUSH_N(&number_stack, &operator_stack, &d);
+
+            if (operator_stack.len < number_stack.len && number_stack.len > 1) {
+                HANDLE_OPERATOR(&number_stack, &operator_stack);
+            }
 
             i += m_index;
 
